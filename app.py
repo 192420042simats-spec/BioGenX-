@@ -145,26 +145,3 @@ if st.button("ANALYZE GENOME"):
             st.write("🧠 Explanation:")
             st.info(disease_explanation(disease, dna, gc))
 
-        # ---------------- RUBRIC SECTION ---------------- #
-
-        st.subheader("📘 Rubric-Based Evaluation Explanation")
-
-        st.markdown("""
-        **✔ Problem Understanding (4 Marks)**  
-        Clearly analyzes DNA sequence and biological constraints like GC content and codons.
-
-        **✔ Algorithm Design (6 Marks)**  
-        Uses rule-based bioinformatics logic including motif detection and codon segmentation.
-
-        **✔ Justification (4 Marks)**  
-        Decisions are based on biological thresholds like GC > 60 and ATG presence.
-
-        **✔ Optimization (3 Marks)**  
-        Linear time complexity O(n) for sequence scanning ensures scalability.
-
-        **✔ Integration (2 Marks)**  
-        Combines statistics, pattern detection, and disease inference in one system.
-
-        **✔ Presentation (1 Mark)**  
-        Clean Streamlit dashboard with structured output sections.
-        """)

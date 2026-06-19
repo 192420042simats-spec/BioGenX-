@@ -3,20 +3,9 @@ import pandas as pd
 
 st.set_page_config(page_title="BioGenX Pro", layout="wide")
 
-st.title("🧬 BioGenX Pro: Genome & Disease Visualization System")
+st.title("🧬 BioGenX Pro: Genome & Disease Intelligence System")
 
 dna = st.text_area("Enter DNA Sequence")
-
-# ---------------- ALGORITHM SELECTION ---------------- #
-
-algorithm = st.selectbox(
-    "Select Analysis Algorithm",
-    [
-        "Basic GC Analysis",
-        "Mutation Risk Model",
-        "Codon Stability Check"
-    ]
-)
 
 def complement(seq):
     comp = ""
@@ -32,6 +21,37 @@ def complement(seq):
     return comp
 
 
+def disease_ai_explanation(name, gc, dna):
+    if name == "Cancer Risk":
+        return (
+            "This pattern shows elevated GC content with oncogene-like sequence presence. "
+            "High GC regions are often associated with unstable replication zones, which may increase mutation probability in dividing cells."
+        )
+
+    elif name == "Mutation Risk":
+        return (
+            "The genome shows increased GC imbalance. This can lead to replication stress and higher mutation frequency during DNA copying processes."
+        )
+
+    elif name == "Genetic Disorder":
+        return (
+            "Specific repeat-like DNA patterns detected. Such patterns are often linked with structural instability in genetic coding regions."
+        )
+
+    elif name == "Stop Codon Instability":
+        return (
+            "Presence of stop codon-like patterns suggests premature termination signals, which may disrupt protein synthesis."
+        )
+
+    elif name == "Codon Stable Genome":
+        return (
+            "No abnormal stop codon disruptions detected. Codon structure appears stable for standard protein translation."
+        )
+
+    else:
+        return "Genome appears stable with no significant abnormal biological markers detected."
+
+
 if st.button("ANALYZE GENOME"):
 
     dna = dna.upper()
@@ -41,8 +61,6 @@ if st.button("ANALYZE GENOME"):
         st.error("Enter valid DNA sequence")
 
     else:
-
-        # ---------------- BASE COUNT ---------------- #
 
         a = dna.count("A")
         t = dna.count("T")
@@ -68,54 +86,43 @@ if st.button("ANALYZE GENOME"):
         st.subheader("🔁 Sequence Analysis")
 
         comp = complement(dna)
+        rev_comp = comp[::-1]
+
         st.code("Complement: " + comp)
-        st.code("Reverse Complement: " + comp[::-1])
+        st.code("Reverse Complement: " + rev_comp)
 
         codons = [dna[i:i+3] for i in range(0, len(dna), 3)]
         st.write("Codons:", "-".join(codons))
 
-        # ---------------- ALGORITHM ENGINE ---------------- #
+        # ---------------- DISEASE ENGINE (3 MODELS) ---------------- #
 
-        st.subheader("🧠 Algorithm Result")
+        st.subheader("🧠 Algorithm Result (Multi-Model Analysis)")
 
-        disease = ""
-        image_url = ""
+        results = []
 
-        if algorithm == "Basic GC Analysis":
+        # Model 1: GC Risk Model
+        if gc > 60:
+            results.append(("Mutation Risk", "High GC content detected leading to replication instability."))
+        else:
+            results.append(("Normal Genome", "GC content within stable biological range."))
 
-            if gc > 60:
-                disease = "Mutation Risk"
-                image_url = "https://upload.wikimedia.org/wikipedia/commons/8/8f/DNA_damage.jpg"
-            else:
-                disease = "Normal Genome"
-                image_url = "https://upload.wikimedia.org/wikipedia/commons/1/1f/Healthy_cells.jpg"
+        # Model 2: Cancer Pattern Model
+        if "ATG" in dna and gc > 55:
+            results.append(("Cancer Risk", "Oncogene-like start codon pattern with high GC imbalance detected."))
+        else:
+            results.append(("Stable Genome", "No oncogenic pattern detected in sequence."))
 
+        # Model 3: Codon Stability Model
+        unstable = ["TAA", "TAG", "TGA"]
+        if any(i in dna for i in unstable):
+            results.append(("Stop Codon Instability", "Premature termination codons found affecting protein synthesis."))
+        else:
+            results.append(("Codon Stable Genome", "No disruptive stop codon patterns found."))
 
-        elif algorithm == "Mutation Risk Model":
-
-            if "ATG" in dna and gc > 55:
-                disease = "Cancer Risk"
-                image_url = "https://upload.wikimedia.org/wikipedia/commons/6/6b/Cancer_cells.jpg"
-            elif gc > 50:
-                disease = "High Mutation Probability"
-                image_url = "https://upload.wikimedia.org/wikipedia/commons/8/8f/DNA_damage.jpg"
-            else:
-                disease = "Stable Genome"
-                image_url = "https://upload.wikimedia.org/wikipedia/commons/1/1f/Healthy_cells.jpg"
-
-
-        elif algorithm == "Codon Stability Check":
-
-            unstable_patterns = ["TAA", "TAG", "TGA"]
-
-            if any(codon in dna for codon in unstable_patterns):
-                disease = "Stop Codon Instability"
-                image_url = "https://upload.wikimedia.org/wikipedia/commons/3/3f/DNA_helix_structure.jpg"
-            else:
-                disease = "Codon Stable Genome"
-                image_url = "https://upload.wikimedia.org/wikipedia/commons/1/1f/Healthy_cells.jpg"
-
-        st.success("Result: " + disease)
-
-        st.subheader("🧬 Visualization")
-        st.image(image_url, use_container_width=True)
+        # DISPLAY RESULTS
+        for i, (name, explanation) in enumerate(results, start=1):
+            st.markdown(f"### 🔬 Model {i}: {name}")
+            st.success(name)
+            st.write("🧠 AI Explanation:")
+            st.info(explanation)
+            st.divider()
